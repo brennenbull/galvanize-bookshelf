@@ -18,7 +18,7 @@ router.use(cookieParser());
 
 router.get('/token', (req, res, next)=>{
   let token = req.cookies.token;
-  jwt.verify(token, 'secret', (err, decoded)=>{
+  jwt.verify(token, process.env.JWT_KEY, (err, decoded)=>{
     if(err){
       return res.send(false);
     }
@@ -41,7 +41,7 @@ router.post('/token', (req, res, next)=>{
         let tokenRes = resBody;
         delete tokenRes.created_at;
         delete tokenRes.updated_at;
-        let token = jwt.sign(tokenRes, 'secret');
+        let token = jwt.sign(tokenRes, process.env.JWT_KEY);
         res.cookie('token', token, {httpOnly: true});
         return res.send(humps.camelizeKeys(resBody));
       }else{

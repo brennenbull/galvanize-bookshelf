@@ -17,7 +17,7 @@ router.use(cookieParser());
 
 router.use('/favorites', function(req, res, next){
   let token = req.cookies.token;
-  jwt.verify(token, 'secret', (err, decoded)=>{
+  jwt.verify(token, process.env.JWT_KEY, (err, decoded)=>{
     if(decoded){
       req.body.payload = decoded;
       return next();
@@ -31,7 +31,7 @@ router.use('/favorites', function(req, res, next){
 router.get('/favorites', (req, res, next)=>{
   let token = req.cookies.token;
   let userId;
-  jwt.verify(token, 'secret', (err, decoded)=>{
+  jwt.verify(token, process.env.JWT_KEY, (err, decoded)=>{
     userId = decoded.id;
     knex('favorites').where('user_id', userId).innerJoin('books','books.id', '=','favorites.book_id').then((result)=>{
       res.send(humps.camelizeKeys(result));
@@ -42,7 +42,7 @@ router.get('/favorites', (req, res, next)=>{
 router.get('/favorites/check', (req, res, next)=>{
   let token = req.cookies.token;
   let userId;
-  jwt.verify(token, 'secret', (err, decoded)=>{
+  jwt.verify(token, process.env.JWT_KEY, (err, decoded)=>{
     let bookId = req.query.bookId;
     userId = decoded.id;
     knex('favorites').where('user_id', userId).where('book_id', bookId).then((result)=>{
@@ -57,7 +57,7 @@ router.get('/favorites/check', (req, res, next)=>{
 
 router.post('/favorites', (req, res, next)=>{
   let token = req.cookies.token;
-  jwt.verify(token, 'secret', (err, decoded)=>{
+  jwt.verify(token, process.env.JWT_KEY, (err, decoded)=>{
     let newFavObj = {};
     newFavObj.bookId = req.body.bookId;
     newFavObj.userId = decoded.id;
@@ -71,7 +71,7 @@ router.post('/favorites', (req, res, next)=>{
 
 router.delete('/favorites', (req, res, next)=>{
   let token = req.cookies.token;
-  jwt.verify(token, 'secret', (err, decoded)=>{
+  jwt.verify(token, process.env.JWT_KEY, (err, decoded)=>{
     let delID = req.body.bookId;
     knex('favorites').where('book_id',delID)
     .returning('*').del().then((result)=>{
